@@ -32,4 +32,3 @@ Welcome to the official CarFlex Mobile app.
 ---
 
 &copy; CarFlex.Ltd. All rights reserved.
-```  

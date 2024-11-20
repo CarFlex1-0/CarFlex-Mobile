@@ -7,10 +7,10 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
 
   return (
-    <View className="flex-1 bg-white p-4">
+    <View className="flex-1 bg-slate-700 p-4">
       <YStack space="$4" className="mt-20">
-        <Text fontSize="$8" fontWeight="bold" className="text-center mb-10">
-          Welcome Back
+        <Text fontSize="$7" fontWeight="bold" className="text-center mb-10">
+          Log in!
         </Text>
 
         <Input

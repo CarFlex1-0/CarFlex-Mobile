@@ -23,6 +23,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "fonts": [
+      {
+        "asset": "./assets/fonts/Orbitron-Regular.ttf",
+        "family": "Orbitron"
+      }
+    ]
   }
 }

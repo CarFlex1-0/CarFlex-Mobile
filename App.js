@@ -2,9 +2,11 @@ import { StatusBar } from "expo-status-bar";
 import "./global.css";
 import { useFonts } from 'expo-font';
 import { TamaguiProvider } from 'tamagui';
+import { ToastProvider } from '@tamagui/toast'
 import tamaguiConfig from './tamagui.config';
 import { useEffect } from "react";
 import AppNavigator from './src/navigation/AppNavigator';
+import { AuthProvider } from './src/contexts/AuthContext';
 
 export default function App() {
   const [loaded] = useFonts({
@@ -23,10 +25,14 @@ export default function App() {
   }
 
   return (
-    <TamaguiProvider config={tamaguiConfig}>
-      <AppNavigator />
-      <StatusBar style="auto" />
-    </TamaguiProvider>
+    <AuthProvider>
+      <TamaguiProvider config={tamaguiConfig}>
+        <ToastProvider>
+          <AppNavigator />
+          <StatusBar style="auto" />
+        </ToastProvider>
+      </TamaguiProvider>
+    </AuthProvider>
   );
 }
 

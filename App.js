@@ -1,3 +1,5 @@
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from "expo-status-bar";
 import "./global.css";
 import { useFonts } from 'expo-font';
@@ -7,6 +9,7 @@ import tamaguiConfig from './tamagui.config';
 import { useEffect } from "react";
 import AppNavigator from './src/navigation/AppNavigator';
 import { AuthProvider } from './src/contexts/AuthContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() {
   const [loaded] = useFonts({
@@ -25,14 +28,16 @@ export default function App() {
   }
 
   return (
-    <AuthProvider>
+    <SafeAreaProvider>
       <TamaguiProvider config={tamaguiConfig}>
-        <ToastProvider>
-          <AppNavigator />
+        <AuthProvider>
+          <NavigationContainer>
+            <AppNavigator />
+          </NavigationContainer>
           <StatusBar style="auto" />
-        </ToastProvider>
+        </AuthProvider>
       </TamaguiProvider>
-    </AuthProvider>
+    </SafeAreaProvider>
   );
 }
 

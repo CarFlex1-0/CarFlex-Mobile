@@ -1,31 +1,46 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from "react";
 import {
   ActivityIndicator,
   Dimensions,
   Keyboard,
   TouchableWithoutFeedback,
   View,
-  Platform
-} from 'react-native';
-import { Text, YStack, Button, Input, XStack, Label, AlertDialog } from 'tamagui';
-import { LinearGradient } from 'expo-linear-gradient';
-import axiosInstance from '../../services/axiosInstance';
-import { useAuth } from '../../contexts/AuthContext';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+  Platform,
+} from "react-native";
+import {
+  Text,
+  YStack,
+  Button,
+  Input,
+  XStack,
+  Label,
+  AlertDialog,
+} from "tamagui";
+import { LinearGradient } from "expo-linear-gradient";
+import axiosInstance from "../../services/axiosInstance";
+import { useAuth } from "../../contexts/AuthContext";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-const { height, width } = Dimensions.get('window');
+const { height, width } = Dimensions.get("window");
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [alertConfig, setAlertConfig] = useState({ show: false, title: '', message: '' });
+  const [alertConfig, setAlertConfig] = useState({
+    show: false,
+    title: "",
+    message: "",
+  });
   const { login, loading, setLoading } = useAuth();
 
-  const inputIds = useMemo(() => ({
-    email: `login-email-${Date.now()}`,
-    password: `login-password-${Date.now()}`
-  }), []);
+  const inputIds = useMemo(
+    () => ({
+      email: `login-email-${Date.now()}`,
+      password: `login-password-${Date.now()}`,
+    }),
+    []
+  );
 
   const showAlert = (title, message) => {
     setAlertConfig({ show: true, title, message });
@@ -35,11 +50,12 @@ export default function LoginScreen({ navigation }) {
     const newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!email) newErrors.email = 'Email is required';
-    else if (!emailRegex.test(email)) newErrors.email = 'Invalid email format';
+    if (!email) newErrors.email = "Email is required";
+    else if (!emailRegex.test(email)) newErrors.email = "Invalid email format";
 
-    if (!password) newErrors.password = 'Password is required';
-    else if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    if (!password) newErrors.password = "Password is required";
+    else if (password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -47,21 +63,21 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     if (!validateForm()) {
-      showAlert('Validation Error', 'Please fix the errors before submitting');
+      showAlert("Validation Error", "Please fix the errors before submitting");
       return;
     }
-    
+
     setLoading(true);
     try {
-      const response = await axiosInstance.post('/user/login', {
+      const response = await axiosInstance.post("/user/login", {
         email: email.toLowerCase(),
-        password
+        password,
       });
       await login(response.data);
-      showAlert('Success', 'Login successful!');
-      navigation.navigate('Home');
+      showAlert("Success", "Login successful!");
+      navigation.navigate("MainTabs");
     } catch (error) {
-      showAlert('Error', error.response?.data?.message || 'Login failed');
+      showAlert("Error", error.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -71,23 +87,21 @@ export default function LoginScreen({ navigation }) {
     let keyboardDidShow;
     let keyboardDidHide;
 
-    const unsubscribe = navigation.addListener('focus', () => {
+    const unsubscribe = navigation.addListener("focus", () => {
       setErrors({});
-      
+
       keyboardDidShow = Keyboard.addListener(
-        Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-        (e) => {
-        }
+        Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+        (e) => {}
       );
 
       keyboardDidHide = Keyboard.addListener(
-        Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-        () => {
-        }
+        Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+        () => {}
       );
     });
 
-    const blurSubscribe = navigation.addListener('blur', () => {
+    const blurSubscribe = navigation.addListener("blur", () => {
       keyboardDidShow?.remove();
       keyboardDidHide?.remove();
     });
@@ -102,7 +116,7 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <LinearGradient
-      colors={['#1e3a8a', '#312e81', '#1e1b4b']}
+      colors={["#1e3a8a", "#312e81", "#1e1b4b"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={{ flex: 1 }}
@@ -112,20 +126,20 @@ export default function LoginScreen({ navigation }) {
         enableOnAndroid={true}
         enableAutomaticScroll={true}
         keyboardShouldPersistTaps="handled"
-        extraScrollHeight={Platform.OS === 'ios' ? 100 : 20}
+        extraScrollHeight={Platform.OS === "ios" ? 100 : 20}
         enableResetScrollToCoords={false}
         scrollEnabled={true}
         showsVerticalScrollIndicator={false}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={{ flex: 1 }}>
-            <YStack 
-              space="$4" 
+            <YStack
+              space="$4"
               px="$6"
-              style={{ 
+              style={{
                 paddingTop: height * 0.15,
                 flex: 1,
-                justifyContent: 'center'
+                justifyContent: "center",
               }}
             >
               <YStack space="$2" mb="$6">
@@ -149,7 +163,9 @@ export default function LoginScreen({ navigation }) {
 
               <YStack space="$4" mb="$6">
                 <YStack space="$2">
-                  <Label htmlFor={inputIds.email} color="white">Email Address</Label>
+                  <Label htmlFor={inputIds.email} color="white">
+                    Email Address
+                  </Label>
                   <Input
                     id={inputIds.email}
                     size="$4"
@@ -162,12 +178,12 @@ export default function LoginScreen({ navigation }) {
                       setErrors({ ...errors, email: null });
                     }}
                     backgroundColor="$gray100"
-                    borderColor={errors.email ? '$red8' : '$yellow400'}
-                    focusStyle={{ borderColor: '$yellow500' }}
+                    borderColor={errors.email ? "$red8" : "$yellow400"}
+                    focusStyle={{ borderColor: "$yellow500" }}
                   />
                   {errors.email && (
-                    <Text 
-                      color="$red8" 
+                    <Text
+                      color="$red8"
                       fontSize="$4"
                       fontWeight="bold"
                       paddingLeft="$2"
@@ -178,7 +194,9 @@ export default function LoginScreen({ navigation }) {
                 </YStack>
 
                 <YStack space="$2">
-                  <Label htmlFor={inputIds.password} color="white">Password</Label>
+                  <Label htmlFor={inputIds.password} color="white">
+                    Password
+                  </Label>
                   <Input
                     id={inputIds.password}
                     size="$4"
@@ -191,12 +209,12 @@ export default function LoginScreen({ navigation }) {
                       setErrors({ ...errors, password: null });
                     }}
                     backgroundColor="$gray100"
-                    borderColor={errors.password ? '$red8' : '$yellow400'}
-                    focusStyle={{ borderColor: '$yellow500' }}
+                    borderColor={errors.password ? "$red8" : "$yellow400"}
+                    focusStyle={{ borderColor: "$yellow500" }}
                   />
                   {errors.password && (
-                    <Text 
-                      color="$red8" 
+                    <Text
+                      color="$red8"
                       fontSize="$4"
                       fontWeight="bold"
                       paddingLeft="$2"
@@ -211,7 +229,7 @@ export default function LoginScreen({ navigation }) {
                     color="$yellow400"
                     fontSize="$3"
                     fontWeight="bold"
-                    onPress={() => navigation.navigate('ForgotPassword')}
+                    onPress={() => navigation.navigate("ForgotPassword")}
                     pressStyle={{ opacity: 0.8 }}
                   >
                     Forgot Password?
@@ -228,7 +246,7 @@ export default function LoginScreen({ navigation }) {
                 onPress={handleLogin}
                 borderRadius="$4"
               >
-                {loading ? <ActivityIndicator color="$gray900" /> : 'Login'}
+                {loading ? <ActivityIndicator color="$gray900" /> : "Login"}
               </Button>
 
               <XStack justifyContent="center" space="$2" mt="$4">
@@ -236,7 +254,7 @@ export default function LoginScreen({ navigation }) {
                 <Text
                   color="$yellow400"
                   fontWeight="bold"
-                  onPress={() => navigation.navigate('Signup')}
+                  onPress={() => navigation.navigate("Signup")}
                   pressStyle={{ opacity: 0.8 }}
                 >
                   Sign Up
@@ -247,9 +265,11 @@ export default function LoginScreen({ navigation }) {
         </TouchableWithoutFeedback>
       </KeyboardAwareScrollView>
 
-      <AlertDialog 
-        open={alertConfig.show} 
-        onOpenChange={(open) => setAlertConfig(prev => ({ ...prev, show: open }))}
+      <AlertDialog
+        open={alertConfig.show}
+        onOpenChange={(open) =>
+          setAlertConfig((prev) => ({ ...prev, show: open }))
+        }
       >
         <AlertDialog.Portal>
           <AlertDialog.Overlay
@@ -264,7 +284,7 @@ export default function LoginScreen({ navigation }) {
             elevate
             key="content"
             animation={[
-              'quick',
+              "quick",
               {
                 opacity: {
                   overshootClamping: true,
@@ -286,9 +306,11 @@ export default function LoginScreen({ navigation }) {
 
               <XStack gap="$3" justifyContent="flex-end">
                 <AlertDialog.Action asChild>
-                  <Button 
+                  <Button
                     theme="active"
-                    onPress={() => setAlertConfig(prev => ({ ...prev, show: false }))}
+                    onPress={() =>
+                      setAlertConfig((prev) => ({ ...prev, show: false }))
+                    }
                   >
                     OK
                   </Button>
@@ -300,4 +322,4 @@ export default function LoginScreen({ navigation }) {
       </AlertDialog>
     </LinearGradient>
   );
-} 
+}

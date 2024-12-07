@@ -13,13 +13,22 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -29,6 +38,28 @@
         "asset": "./assets/fonts/Orbitron-Regular.ttf",
         "family": "Orbitron"
       }
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    },
+    "plugins": [
+      
+    ],
+    "experiments": {
+      "tsconfigPaths": true
+    },
+    "packagerOpts": {
+      "hostType": "lan"
+    },
+    "devServer": {
+      "proxy": {
+        "/api": {
+          "target": "http://192.168.1.74:5000",
+          "changeOrigin": true
+        }
+      }
+    }
   }
 }

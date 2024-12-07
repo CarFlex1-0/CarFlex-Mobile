@@ -1,38 +1,133 @@
-import React, { useState } from 'react';
-import { ScrollView, View } from 'react-native';
-import { Text, YStack, XStack, Button, Spinner } from 'tamagui';
+import React, { useState, useEffect } from 'react';
+import { ScrollView, View, ActivityIndicator } from 'react-native';
+import { Text, YStack, XStack, Button, Card } from 'tamagui';
 import { Ionicons } from '@expo/vector-icons';
 import GlassCard from '../../components/common/GlassCard';
 import theme from '../../constants/theme';
 import ScreenLayout from '../../components/common/ScreenLayout';
+import { useOBD } from '../../context/OBDContext';
 
-export default function OBDSetupScreen({ navigation }) {
-  const [scanning, setScanning] = useState(false);
-  const [devices, setDevices] = useState([]);
-  const [selectedDevice, setSelectedDevice] = useState(null);
+// Predefined scenarios
+const CARS = [
+  'Toyota Corolla 2022',
+  'Honda Civic 2023',
+  'Suzuki Swift 2021',
+  'Hyundai Elantra 2023',
+  'Kia Forte 2022'
+];
+
+const SCENARIOS = {
+  NORMAL_DRIVE: {
+    name: 'Normal Drive',
+    description: 'Simulates normal driving conditions',
+    values: {
+      rpm: 2000,
+      speed: 60,
+      temp: 90,
+      fuel: 75
+    }
+  },
+  IDLE: {
+    name: 'Engine Idle',
+    description: 'Simulates engine at idle',
+    values: {
+      rpm: 800,
+      speed: 0,
+      temp: 85,
+      fuel: 80
+    }
+  },
+  HIGHWAY: {
+    name: 'Highway Drive',
+    description: 'Simulates highway driving',
+    values: {
+      rpm: 3000,
+      speed: 120,
+      temp: 95,
+      fuel: 65
+    }
+  },
+  ACCELERATION: {
+    name: 'Acceleration Test',
+    description: '0-120 km/h acceleration simulation',
+    values: {
+      rpm: 1000,
+      speed: 0,
+      temp: 85,
+      fuel: 70
+    },
+    isAcceleration: true  // Flag to identify acceleration scenario
+  }
+};
+
+function OBDSetupContent({ navigation }) {
+  const obd = useOBD();
   const [connecting, setConnecting] = useState(false);
+  const [localError, setLocalError] = useState(null);
+  const [selectedScenario, setSelectedScenario] = useState(null);
+  const [showScenarios, setShowScenarios] = useState(false);
+  const [detectedCar, setDetectedCar] = useState('');
 
-  const startScan = () => {
-    setScanning(true);
-    // Simulated device discovery
-    setTimeout(() => {
-      setDevices([
-        { id: '1', name: 'OBD-II Scanner Pro', address: '00:11:22:33:44:55', signal: 'Strong' },
-        { id: '2', name: 'Car Scanner ELM327', address: '66:77:88:99:AA:BB', signal: 'Medium' },
-        { id: '3', name: 'BlueDriver OBD2', address: 'CC:DD:EE:FF:00:11', signal: 'Strong' },
-      ]);
-      setScanning(false);
-    }, 2000);
+  useEffect(() => {
+    console.log('OBDSetupContent mounted');
+    setLocalError(null);
+    return () => {
+      console.log('OBDSetupContent unmounting');
+      if (obd.connected) {
+        obd.disconnect();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (obd.connected) {
+      const randomCar = CARS[Math.floor(Math.random() * CARS.length)];
+      setDetectedCar(randomCar);
+    }
+  }, [obd.connected]);
+
+  console.log('Checking OBD context:', obd);
+
+  const connectToOBD = async () => {
+    console.log('Connect button pressed');
+    setConnecting(true);
+    setLocalError(null);
+    
+    try {
+      const options = {
+        port: 35000,
+      };
+
+      console.log('Calling connect with options:', options);
+      const success = await obd.connect(options);
+      console.log('Connect result:', success);
+      
+      if (success) {
+        setShowScenarios(true);
+      }
+    } catch (err) {
+      console.error('Connection error:', err);
+      setLocalError('Connection failed: ' + (err.message || 'Unknown error'));
+    } finally {
+      setConnecting(false);
+    }
   };
 
-  const connectToDevice = async (device) => {
-    setConnecting(true);
-    setSelectedDevice(device);
-    // Simulated connection process
-    setTimeout(() => {
-      setConnecting(false);
-      navigation.navigate('Dashboard');
-    }, 2000);
+  const selectScenario = async (scenarioKey) => {
+    console.log(`Selecting scenario: ${scenarioKey}`);
+    try {
+      const scenario = SCENARIOS[scenarioKey];
+      if (scenario.isAcceleration) {
+        // Handle acceleration scenario differently
+        await obd.setAccelerationScenario();
+      } else {
+        await obd.setScenario(scenario.values);
+      }
+      setSelectedScenario(scenarioKey);
+    } catch (err) {
+      console.error('Scenario selection error:', err);
+      setLocalError('Failed to set scenario: ' + (err.message || 'Unknown error'));
+    }
   };
 
   return (
@@ -52,149 +147,97 @@ export default function OBDSetupScreen({ navigation }) {
             >
               OBD Setup
             </Text>
+            {detectedCar && obd.connected && (
+              <Text color={theme.colors.text.primary} fontSize="$5" opacity={0.9}>
+                Connected to: {detectedCar}
+              </Text>
+            )}
             <Text color={theme.colors.text.primary} fontSize="$4" opacity={0.9}>
-              Connect your vehicle's OBD scanner
+              Connect to OBD Simulator
             </Text>
           </YStack>
 
-          {/* Setup Instructions */}
-          <GlassCard padding="$4">
-            <YStack space="$4">
-              <Text color={theme.colors.text.primary} fontSize="$6" fontWeight="bold">
-                Setup Guide
-              </Text>
-              {[
-                'Plug in your OBD-II adapter',
-                'Turn on your vehicle',
-                'Enable Bluetooth on your phone',
-                'Scan for available devices'
-              ].map((step, index) => (
-                <XStack key={index} space="$2" alignItems="center">
-                  <View
-                    style={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: 12,
-                      backgroundColor: theme.colors.secondary.yellow,
-                      justifyContent: 'center',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <Text color={theme.colors.primary.dark} fontWeight="bold">
-                      {index + 1}
-                    </Text>
-                  </View>
-                  <Text color={theme.colors.text.primary} fontSize="$4">
-                    {step}
-                  </Text>
-                </XStack>
-              ))}
-            </YStack>
-          </GlassCard>
-
-          {/* Scan Button */}
+          {/* Connect Button */}
           <Button
             size="$4"
-            backgroundColor={theme.colors.secondary.yellow}
+            backgroundColor={obd.connected ? theme.colors.success : theme.colors.secondary.yellow}
             color={theme.colors.primary.dark}
-            onPress={startScan}
-            disabled={scanning}
-            icon={scanning ? 
-              <Spinner color={theme.colors.primary.dark} /> : 
-              <Ionicons name="bluetooth" size={20} color={theme.colors.primary.dark} />
+            onPress={connectToOBD}
+            disabled={connecting || obd.connected}
+            icon={
+              connecting ? <ActivityIndicator color={theme.colors.primary.dark} /> :
+              obd.connected ? <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary.dark} /> :
+              <Ionicons name="link" size={20} color={theme.colors.primary.dark} />
             }
           >
-            {scanning ? 'Scanning...' : 'Scan for Devices'}
+            {connecting ? 'Connecting...' : obd.connected ? 'Connected' : 'Connect to OBD'}
           </Button>
 
-          {/* Available Devices */}
-          {devices.length > 0 && (
+          {/* Scenarios Section */}
+          {showScenarios && (
+            <YStack space="$4">
+              <Text color={theme.colors.text.primary} fontSize="$6" fontWeight="bold">
+                Select Scenario
+              </Text>
+              {Object.entries(SCENARIOS).map(([key, scenario]) => (
+                <GlassCard 
+                  key={key}
+                  padding="$4"
+                  pressable
+                  onPress={() => selectScenario(key)}
+                  backgroundColor={selectedScenario === key ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)'}
+                >
+                  <YStack space="$2">
+                    <Text color={theme.colors.text.primary} fontSize="$5" fontWeight="bold">
+                      {scenario.name}
+                    </Text>
+                    <Text color={theme.colors.text.primary} fontSize="$3" opacity={0.8}>
+                      {scenario.description}
+                    </Text>
+                  </YStack>
+                </GlassCard>
+              ))}
+            </YStack>
+          )}
+
+          {/* Live Data Display */}
+          {selectedScenario && (
             <GlassCard padding="$4">
               <YStack space="$4">
-                <Text color={theme.colors.text.primary} fontSize="$5" fontWeight="bold">
-                  Available Devices
+                <Text color={theme.colors.text.primary} fontSize="$6" fontWeight="bold">
+                  Live Data
                 </Text>
-                {devices.map(device => (
-                  <GlassCard
-                    key={device.id}
-                    padding="$4"
-                    gradient={theme.colors.gradients.card}
-                    pressStyle={{ opacity: 0.8 }}
-                    onPress={() => connectToDevice(device)}
-                  >
-                    <XStack justifyContent="space-between" alignItems="center">
-                      <YStack space="$1">
-                        <Text color={theme.colors.text.primary} fontSize="$4" fontWeight="bold">
-                          {device.name}
-                        </Text>
-                        <XStack space="$2" alignItems="center">
-                          <Text color={theme.colors.text.secondary} fontSize="$3">
-                            {device.address}
-                          </Text>
-                          <Text color={theme.colors.secondary.yellow} fontSize="$3">
-                            • {device.signal} Signal
-                          </Text>
-                        </XStack>
-                      </YStack>
-                      {selectedDevice?.id === device.id ? (
-                        connecting ? (
-                          <Spinner color={theme.colors.secondary.yellow} />
-                        ) : (
-                          <Ionicons name="checkmark-circle" size={24} color={theme.colors.secondary.yellow} />
-                        )
-                      ) : (
-                        <Button
-                          size="$3"
-                          backgroundColor={theme.colors.glass.light}
-                          color={theme.colors.text.primary}
-                          borderColor={theme.colors.glass.border}
-                          borderWidth={1}
-                          onPress={() => connectToDevice(device)}
-                          icon={<Ionicons name="link" size={16} color={theme.colors.text.primary} />}
-                        >
-                          Connect
-                        </Button>
-                      )}
-                    </XStack>
-                  </GlassCard>
-                ))}
+                <XStack flexWrap="wrap" justifyContent="space-between">
+                  {Object.entries(obd.data).map(([key, value]) => (
+                    <View key={key} style={{ width: '48%', marginBottom: 10 }}>
+                      <Text color={theme.colors.text.primary} fontSize="$4" fontWeight="bold">
+                        {key.toUpperCase()}
+                      </Text>
+                      <Text color={theme.colors.text.accent} fontSize="$5">
+                        {value} {key === 'speed' ? 'km/h' : 
+                               key === 'rpm' ? 'RPM' : 
+                               key === 'temp' ? '°C' : '%'}
+                      </Text>
+                    </View>
+                  ))}
+                </XStack>
               </YStack>
             </GlassCard>
           )}
 
-          {/* Troubleshooting */}
-          <GlassCard padding="$4">
-            <YStack space="$3">
-              <Text color={theme.colors.text.primary} fontSize="$5" fontWeight="bold">
-                Troubleshooting
-              </Text>
-              {[
-                'Make sure your OBD adapter is properly plugged in',
-                'Ensure your vehicle\'s ignition is turned on',
-                'Check if Bluetooth is enabled on your device'
-              ].map((tip, index) => (
-                <XStack key={index} space="$2" alignItems="center">
-                  <Ionicons name="information-circle" size={20} color={theme.colors.secondary.yellow} />
-                  <Text color={theme.colors.text.secondary} fontSize="$3" flex={1}>
-                    {tip}
-                  </Text>
-                </XStack>
-              ))}
-              <Button
-                size="$3"
-                backgroundColor={theme.colors.glass.light}
-                color={theme.colors.text.primary}
-                borderColor={theme.colors.glass.border}
-                borderWidth={1}
-                onPress={() => {/* Add help documentation navigation */}}
-                icon={<Ionicons name="help-circle" size={20} color={theme.colors.text.primary} />}
-              >
-                View Help Guide
-              </Button>
-            </YStack>
-          </GlassCard>
+          {/* Error Message */}
+          {(localError || obd.error) && (
+            <Text color="red" fontSize="$4" textAlign="center">
+              {localError || obd.error}
+            </Text>
+          )}
         </YStack>
       </ScrollView>
     </ScreenLayout>
   );
+}
+
+export default function OBDSetupScreen(props) {
+  console.log('Rendering OBDSetupContent');
+  return <OBDSetupContent {...props} />;
 } 

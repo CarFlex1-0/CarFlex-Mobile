@@ -43,6 +43,7 @@
     "react-native-safe-area-context": "^4.14.0",
     "react-native-screens": "^4.3.0",
     "react-native-svg": "^15.9.0",
+    "react-native-tcp-socket": "^6.2.0",
     "tailwindcss": "^3.4.15",
     "tamagui": "^1.117.0"
   },
@@ -51,5 +52,8 @@
     "@babel/runtime": "^7.26.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4"
   },
-  "private": true
+  "private": true,
+  "react-native": {
+    "net": "react-native-tcp-socket"
+  }
 }

@@ -1,20 +1,20 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect } from "react";
+import { TamaguiProvider } from "tamagui";
+import tamaguiConfig from "./tamagui.config";
+import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import "./global.css";
-import { useFonts } from 'expo-font';
-import { TamaguiProvider } from 'tamagui';
-import { ToastProvider } from '@tamagui/toast'
-import tamaguiConfig from './tamagui.config';
-import { useEffect } from "react";
-import AppNavigator from './src/navigation/AppNavigator';
-import { AuthProvider } from './src/contexts/AuthContext';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useFonts } from "expo-font";
+import { ToastProvider } from "@tamagui/toast";
+import AppNavigator from "./src/navigation/AppNavigator";
+import { AuthProvider } from "./src/contexts/AuthContext";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { OBDProvider } from './src/context/OBDContext';
 
-export default function App() {
+function AppContent() {
   const [loaded] = useFonts({
-    Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
-    InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
+    Inter: require("@tamagui/font-inter/otf/Inter-Medium.otf"),
+    InterBold: require("@tamagui/font-inter/otf/Inter-Bold.otf"),
   });
 
   useEffect(() => {
@@ -28,17 +28,25 @@ export default function App() {
   }
 
   return (
+    <NavigationContainer>
+      <AppNavigator />
+      <StatusBar style="auto" />
+    </NavigationContainer>
+  );
+}
+
+export default function App() {
+  return (
     <SafeAreaProvider>
       <TamaguiProvider config={tamaguiConfig}>
-        <AuthProvider>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
-          <StatusBar style="auto" />
-        </AuthProvider>
+        <ToastProvider>
+          <OBDProvider>
+            <AuthProvider>
+              <AppContent />
+            </AuthProvider>
+          </OBDProvider>
+        </ToastProvider>
       </TamaguiProvider>
     </SafeAreaProvider>
   );
 }
-
-

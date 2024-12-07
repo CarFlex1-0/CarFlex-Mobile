@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ScrollView, View, Dimensions, Image } from "react-native";
 import { Text, YStack, XStack, Button, Card, Progress } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,17 +11,9 @@ import { useFonts } from "expo-font";
 const { width, height } = Dimensions.get("window");
 
 export default function DashboardScreen({ navigation }) {
-  const [obdConnected, setObdConnected] = useState(false);
   const [fontsLoaded] = useFonts({
     Orbitron: require("../../../assets/fonts/Orbitron-Regular.ttf"),
   });
-
-  const performanceData = {
-    speed: { value: "75", max: "220", unit: "km/h" },
-    rpm: { value: "3500", max: "8000", unit: "RPM" },
-    temp: { value: "90", max: "120", unit: "°C" },
-    fuel: { value: "75", max: "100", unit: "%" },
-  };
 
   const carModels = [
     {
@@ -50,11 +42,11 @@ export default function DashboardScreen({ navigation }) {
     },
   ];
 
-  console.log("Rendering OBD Status Card with styles:", {
-    cardBackground: theme.colors.glass.light,
-    viewBackground: "transparent",
-    padding: "$4",
-  });
+  // console.log("Rendering OBD Status Card with styles:", {
+  //   cardBackground: theme.colors.glass.light,
+  //   viewBackground: "transparent",
+  //   padding: "$4",
+  // });
 
   return (
     <ScreenLayout>
@@ -107,85 +99,26 @@ export default function DashboardScreen({ navigation }) {
                   OBD Status
                 </Text>
                 <Text color={theme.colors.text.secondary} fontSize="$3">
-                  {obdConnected ? "Connected & Monitoring" : "Setup Required"}
+                  {"Setup Required"}
                 </Text>
               </View>
               <Button
                 size="$4"
-                backgroundColor={
-                  obdConnected
-                    ? theme.colors.secondary.yellow
-                    : theme.colors.glass.accent
-                }
-                color={
-                  obdConnected
-                    ? theme.colors.primary.dark
-                    : theme.colors.text.primary
-                }
+                backgroundColor={theme.colors.secondary.yellow}
+                color={theme.colors.primary.dark}
                 onPress={() => navigation.navigate("OBDSetup")}
                 padding="$2"
                 icon={
-                  obdConnected ? (
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={20}
-                      color={theme.colors.primary.dark}
-                    />
-                  ) : (
-                    <Ionicons
-                      name="construct"
-                      size={20}
-                      color={theme.colors.text.primary}
-                    />
-                  )
+                  <Ionicons
+                    name="construct"
+                    size={20}
+                    color={theme.colors.text.primary}
+                  />
                 }
               >
-                {obdConnected ? "Connected" : "Setup OBD"}
+                {"Setup OBD"}
               </Button>
             </XStack>
-
-            {obdConnected && (
-              <View
-                padding="$4"
-                paddingTop={0}
-                style={{ backgroundColor: "transparent" }}
-              >
-                {Object.entries(performanceData).map(([key, data]) => (
-                  <View
-                    key={key}
-                    marginTop="$4"
-                    style={{ backgroundColor: "transparent" }}
-                  >
-                    <XStack justifyContent="space-between" marginBottom="$2">
-                      <Text
-                        color={theme.colors.text.primary}
-                        fontSize="$3"
-                        textTransform="capitalize"
-                      >
-                        {key}
-                      </Text>
-                      <Text
-                        color={theme.colors.text.accent}
-                        fontSize="$3"
-                        fontWeight="bold"
-                      >
-                        {data.value}
-                        {data.unit}
-                      </Text>
-                    </XStack>
-                    <Progress
-                      value={parseInt(data.value)}
-                      backgroundColor={theme.colors.glass.medium}
-                    >
-                      <Progress.Indicator
-                        animation="bouncy"
-                        backgroundColor={theme.colors.secondary.yellow}
-                      />
-                    </Progress>
-                  </View>
-                ))}
-              </View>
-            )}
           </GlassCard>
 
           {/* AR Models Section */}

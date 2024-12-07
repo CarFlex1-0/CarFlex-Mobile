@@ -1,0 +1,11 @@
+{
+  "name": "obd-proxy-server",
+  "version": "1.0.0",
+  "main": "obd-proxy.js",
+  "scripts": {
+    "start": "node obd-proxy.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+} 

@@ -2,6 +2,8 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import { View } from "react-native";
+import theme from "../constants/theme";
 
 // Auth Screens
 import LoginScreen from "../screens/auth/LoginScreen";
@@ -17,6 +19,7 @@ import CartScreen from "../screens/app/CartScreen";
 import ProductDetailsScreen from "../screens/app/ProductDetailsScreen";
 import CheckoutScreen from "../screens/app/CheckoutScreen";
 import OrderSuccessScreen from "../screens/app/OrderSuccessScreen";
+import OrderHistoryScreen from "../screens/app/OrderHistoryScreen";
 // import ProfileScreen from '../screens/app/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
@@ -36,21 +39,81 @@ function TabNavigator() {
             case "Marketplace":
               iconName = focused ? "cart" : "cart-outline";
               break;
-            case "Profile":
-              iconName = focused ? "person" : "person-outline";
+            case "Cart":
+              iconName = focused ? "basket" : "basket-outline";
+              break;
+            case "Orders":
+              iconName = focused ? "list" : "list-outline";
               break;
           }
 
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: focused ? `${theme.colors.secondary.yellow}20` : 'transparent',
+                padding: 8,
+                borderRadius: 12,
+                width: size * 2,
+                height: size * 2,
+              }}
+            >
+              <Ionicons name={iconName} size={size} color={focused ? theme.colors.secondary.yellow : color} />
+            </View>
+          );
         },
-        tabBarActiveTintColor: "#1e3a8a",
-        tabBarInactiveTintColor: "gray",
+        tabBarStyle: {
+          backgroundColor: theme.colors.primary.main,
+          borderTopWidth: 0,
+          elevation: 0,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: theme.colors.secondary.yellow,
+        tabBarInactiveTintColor: theme.colors.text.secondary,
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+          marginTop: -4,
+        },
         headerShown: false,
+        tabBarShowLabel: true,
+        tabBarHideOnKeyboard: true,
+        tabBarItemStyle: {
+          paddingVertical: 4,
+        },
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Marketplace" component={MarketplaceScreen} />
-      {/* <Tab.Screen name="Profile" component={ProfileScreen} /> */}
+      <Tab.Screen 
+        name="Dashboard" 
+        component={DashboardScreen}
+        options={{
+          tabBarLabel: 'Dashboard',
+        }}
+      />
+      <Tab.Screen 
+        name="Marketplace" 
+        component={MarketplaceScreen}
+        options={{
+          tabBarLabel: 'Shop',
+        }}
+      />
+      <Tab.Screen 
+        name="Cart" 
+        component={CartScreen}
+        options={{
+          tabBarLabel: 'Cart',
+        }}
+      />
+      <Tab.Screen 
+        name="Orders" 
+        component={OrderHistoryScreen}
+        options={{
+          tabBarLabel: 'Orders',
+        }}
+      />
     </Tab.Navigator>
   );
 }

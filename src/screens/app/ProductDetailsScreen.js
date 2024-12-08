@@ -6,21 +6,26 @@ import { LinearGradient } from 'expo-linear-gradient';
 import GlassCard from '../../components/common/GlassCard';
 import theme from '../../constants/theme';
 import ScreenLayout from '../../components/common/ScreenLayout';
+import { useCartStore } from '../../store/cartStore';
 
 const { width, height } = Dimensions.get('window');
 
 export default function ProductDetailsScreen({ route, navigation }) {
   const { product } = route.params;
   const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCartStore();
 
-  const addToCart = async () => {
-    try {
-      // Add to cart logic will be implemented when backend is ready
-      // For now, just navigate to cart
-      navigation.navigate('Cart');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-    }
+  const handleAddToCart = () => {
+    const cartItem = {
+      ...product,
+      quantity,
+      seller: {
+        _id: product.seller
+      }
+    };
+    
+    addToCart(cartItem);
+    navigation.navigate('Cart');
   };
 
   return (
@@ -29,7 +34,7 @@ export default function ProductDetailsScreen({ route, navigation }) {
         {/* Product Image with Gradient Overlay */}
         <YStack>
           <Image
-            source={{ uri: product.image }}
+            source={{ uri: product.imageUrl?.url }}
             style={{
               width: width,
               height: height * 0.4,
@@ -56,17 +61,9 @@ export default function ProductDetailsScreen({ route, navigation }) {
                 {product.name}
               </Text>
               
-              <XStack justifyContent="space-between" alignItems="center">
-                <Text color={theme.colors.text.accent} fontSize="$6" fontWeight="bold">
-                  ${product.price}
-                </Text>
-                <XStack space="$2" alignItems="center">
-                  <Ionicons name="star" size={20} color={theme.colors.secondary.yellow} />
-                  <Text color={theme.colors.text.primary} fontSize="$4">
-                    {product.rating}
-                  </Text>
-                </XStack>
-              </XStack>
+              <Text color={theme.colors.text.accent} fontSize="$6" fontWeight="bold">
+                PKR {product.price}
+              </Text>
 
               <Text color={theme.colors.text.secondary} fontSize="$4" marginTop="$2">
                 {product.description}
@@ -81,33 +78,28 @@ export default function ProductDetailsScreen({ route, navigation }) {
                 Specifications
               </Text>
               
-              <XStack justifyContent="space-between">
-                <YStack space="$3" flex={1}>
-                  <SpecItem 
-                    icon="bookmark" 
-                    label="Brand" 
-                    value={product.brand} 
-                  />
-                  <SpecItem 
-                    icon="apps" 
-                    label="Category" 
-                    value={product.category} 
-                  />
-                </YStack>
-                
-                <YStack space="$3" flex={1}>
-                  <SpecItem 
-                    icon="cube" 
-                    label="Stock" 
-                    value={`${product.stock} units`} 
-                  />
-                  <SpecItem 
-                    icon="checkmark-circle" 
-                    label="Status" 
-                    value={product.status} 
-                  />
-                </YStack>
-              </XStack>
+              <YStack space="$3">
+                <SpecItem 
+                  icon="bookmark" 
+                  label="Brand" 
+                  value={product.brand} 
+                />
+                <SpecItem 
+                  icon="apps" 
+                  label="Category" 
+                  value={product.category} 
+                />
+                <SpecItem 
+                  icon="cube" 
+                  label="Stock" 
+                  value={`${product.stock} units`} 
+                />
+                <SpecItem 
+                  icon="checkmark-circle" 
+                  label="Status" 
+                  value={product.status || 'Available'} 
+                />
+              </YStack>
             </YStack>
           </GlassCard>
 
@@ -152,11 +144,15 @@ export default function ProductDetailsScreen({ route, navigation }) {
             size="$5"
             backgroundColor={theme.colors.secondary.yellow}
             color={theme.colors.primary.dark}
-            onPress={addToCart}
+            onPress={handleAddToCart}
             icon={<Ionicons name="cart" size={24} color={theme.colors.primary.dark} />}
             pressStyle={{ opacity: 0.8 }}
+            disabled={product.stock <= 0}
           >
-            Add to Cart - ${(product.price * quantity).toFixed(2)}
+            {product.stock > 0 
+              ? `Add to Cart - PKR ${(product.price * quantity).toFixed(2)}`
+              : 'Out of Stock'
+            }
           </Button>
         </YStack>
       </ScrollView>
@@ -169,11 +165,17 @@ function SpecItem({ icon, label, value }) {
   return (
     <XStack space="$2" alignItems="center">
       <Ionicons name={icon} size={20} color={theme.colors.secondary.yellow} />
-      <YStack>
+      <YStack flex={1}>
         <Text color={theme.colors.text.secondary} fontSize="$3">
           {label}
         </Text>
-        <Text color={theme.colors.text.primary} fontSize="$4" fontWeight="bold">
+        <Text 
+          color={theme.colors.text.primary} 
+          fontSize="$4" 
+          fontWeight="bold"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           {value}
         </Text>
       </YStack>

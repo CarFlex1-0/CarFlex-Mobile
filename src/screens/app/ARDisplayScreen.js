@@ -1,207 +1,206 @@
-import React, { useState } from 'react';
-import { View, ScrollView, Image } from 'react-native';
-import { Text, YStack, XStack, Button } from 'tamagui';
+import React from 'react';
+import { View, Image, Dimensions, StatusBar, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, YStack, Button, XStack } from 'tamagui';
 import { Ionicons } from '@expo/vector-icons';
 import GlassCard from '../../components/common/GlassCard';
 import theme from '../../constants/theme';
 import ScreenLayout from '../../components/common/ScreenLayout';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const { width, height } = Dimensions.get('window');
 
 export default function ARDisplayScreen({ navigation, route }) {
-  const [isARReady, setIsARReady] = useState(false);
   const carId = route.params?.carId;
 
   const carModels = {
-    1: { 
-      name: 'Tesla Model S', 
-      type: 'Electric', 
-      color: 'Red',
-      image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399',
+    1: {
+      name: "Toyota Corolla",
+      type: "Sedan",
+      image: "https://images.unsplash.com/photo-1623869675781-80aa31012a5a?q=80&w=2070&auto=format&fit=crop",
       specs: {
-        range: '405 miles',
-        acceleration: '2.3s 0-60',
-        topSpeed: '200 mph'
+        engine: "1.8L 4-Cylinder",
+        power: "169 hp",
+        transmission: "CVT"
       }
     },
-    2: { 
-      name: 'BMW M4', 
-      type: 'Sports', 
-      color: 'Blue',
-      image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738',
+    2: {
+      name: "Suzuki Swift",
+      type: "Hatchback",
+      image: "https://images.unsplash.com/photo-1609521263047-f8f205293f24?q=80&w=2090&auto=format&fit=crop",
       specs: {
-        power: '503 hp',
-        acceleration: '3.8s 0-60',
-        topSpeed: '180 mph'
+        engine: "1.2L 4-Cylinder",
+        power: "82 hp",
+        transmission: "5-Speed Manual"
       }
     },
-    3: { 
-      name: 'Mercedes G-Wagon', 
-      type: 'SUV', 
-      color: 'Black',
-      image: 'https://images.unsplash.com/photo-1520031441872-265e4ff70366',
+    3: {
+      name: "Honda Civic Type R",
+      type: "Sports Sedan",
+      image: "https://images.unsplash.com/photo-1679263422551-159662623af3?q=80&w=2070&auto=format&fit=crop",
       specs: {
-        power: '416 hp',
-        torque: '450 lb-ft',
-        terrain: 'All-terrain'
+        engine: "2.0L Turbo",
+        power: "315 hp",
+        transmission: "6-Speed Manual"
       }
     }
   };
 
-  const selectedCar = carModels[carId] || carModels[1];
+  const selectedCar = carModels[carId];
 
   return (
-    <ScreenLayout>
-      {/* AR View Placeholder */}
-      <GlassCard
+    <View style={{ flex: 1, backgroundColor: theme.colors.primary.dark }}>
+      <StatusBar barStyle="light-content" />
+      
+      {/* Back Button */}
+      <TouchableOpacity 
+        onPress={() => navigation.goBack()}
         style={{
-          height: '45%',
-          margin: 16,
-          marginBottom: 0
+          position: 'absolute',
+          top: 50,
+          left: 20,
+          zIndex: 10,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          borderRadius: 20,
+          padding: 8,
         }}
-        gradient={theme.colors.gradients.cardDark}
       >
-        <YStack flex={1} justifyContent="center" alignItems="center">
-          <Image
-            source={{ uri: selectedCar.image }}
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              opacity: 0.5,
-              borderRadius: theme.layout.radius.large
-            }}
-            resizeMode="cover"
-          />
-          <Text 
-            color={theme.colors.text.primary} 
-            fontSize="$6" 
-            fontWeight="bold"
-            style={{ textShadowColor: 'rgba(0, 0, 0, 0.5)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 }}
-          >
-            {isARReady ? 'AR Experience Ready' : 'Loading AR Experience...'}
-          </Text>
-        </YStack>
-      </GlassCard>
+        <Ionicons name="arrow-back" size={24} color="white" />
+      </TouchableOpacity>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <YStack space="$4" padding="$4">
-          {/* Car Info */}
-          <GlassCard padding="$4">
-            <YStack space="$4">
-              <Text color={theme.colors.text.accent} fontSize="$7" fontWeight="bold">
+      {/* Main Image Container - Fixed at top */}
+      <View style={{ height: height * 0.45, position: 'absolute', top: 0, left: 0, right: 0 }}>
+        <Image
+          source={{ uri: selectedCar.image }}
+          style={{
+            width: '100%',
+            height: '100%',
+            resizeMode: 'cover',
+          }}
+        />
+        <LinearGradient
+          colors={['rgba(0,0,0,0.4)', 'transparent', theme.colors.primary.dark]}
+          style={{
+            position: 'absolute',
+            height: '100%',
+            width: '100%',
+          }}
+        />
+      </View>
+
+      {/* Scrollable Content */}
+      <ScrollView
+        style={{ flex: 1, marginTop: height * 0.4 }}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        {/* Content Container */}
+        <View style={{
+          backgroundColor: theme.colors.primary.dark,
+          borderTopLeftRadius: 30,
+          borderTopRightRadius: 30,
+          minHeight: height * 0.6,
+          padding: 20,
+          paddingBottom: 40,
+        }}>
+          {/* Car Details */}
+          <YStack space="$4">
+            <YStack space="$2">
+              <Text
+                color={theme.colors.text.primary}
+                fontSize={32}
+                fontWeight="bold"
+                letterSpacing={0.5}
+              >
                 {selectedCar.name}
               </Text>
-              <XStack space="$4" flexWrap="wrap">
-                <Text color={theme.colors.text.primary} fontSize="$4">
-                  Type: {selectedCar.type}
-                </Text>
-                <Text color={theme.colors.text.primary} fontSize="$4">
-                  Color: {selectedCar.color}
-                </Text>
-              </XStack>
-              
-              {/* Specs */}
-              <YStack space="$2" marginTop="$2">
-                {Object.entries(selectedCar.specs).map(([key, value]) => (
-                  <XStack key={key} justifyContent="space-between" alignItems="center">
-                    <Text color={theme.colors.text.secondary} fontSize="$3" textTransform="capitalize">
-                      {key}
-                    </Text>
-                    <Text color={theme.colors.text.primary} fontSize="$4" fontWeight="bold">
-                      {value}
-                    </Text>
-                  </XStack>
-                ))}
-              </YStack>
-            </YStack>
-          </GlassCard>
-
-          {/* AR Controls */}
-          <GlassCard padding="$4">
-            <YStack space="$4">
-              <Text color={theme.colors.text.primary} fontSize="$5" fontWeight="bold">
-                AR Controls
+              <Text
+                color={theme.colors.secondary.yellow}
+                fontSize={18}
+              >
+                {selectedCar.type}
               </Text>
-              
-              <XStack space="$4" flexWrap="wrap">
-                <Button
-                  size="$4"
-                  backgroundColor={theme.colors.secondary.yellow}
-                  color={theme.colors.primary.dark}
-                  icon={<Ionicons name="refresh" size={20} color="black" />}
-                  onPress={() => setIsARReady(true)}
-                  flex={1}
-                >
-                  Reset Position
-                </Button>
-
-                <Button
-                  size="$4"
-                  backgroundColor={theme.colors.glass.light}
-                  color={theme.colors.text.primary}
-                  icon={<Ionicons name="color-palette" size={20} color={theme.colors.text.primary} />}
-                  flex={1}
-                  borderColor={theme.colors.glass.border}
-                  borderWidth={1}
-                >
-                  Change Color
-                </Button>
-              </XStack>
-
-              <XStack space="$4" flexWrap="wrap">
-                <Button
-                  size="$4"
-                  backgroundColor={theme.colors.glass.light}
-                  color={theme.colors.text.primary}
-                  icon={<Ionicons name="resize" size={20} color={theme.colors.text.primary} />}
-                  flex={1}
-                  borderColor={theme.colors.glass.border}
-                  borderWidth={1}
-                >
-                  Scale Model
-                </Button>
-
-                <Button
-                  size="$4"
-                  backgroundColor={theme.colors.glass.light}
-                  color={theme.colors.text.primary}
-                  icon={<Ionicons name="camera" size={20} color={theme.colors.text.primary} />}
-                  flex={1}
-                  borderColor={theme.colors.glass.border}
-                  borderWidth={1}
-                >
-                  Take Photo
-                </Button>
-              </XStack>
             </YStack>
-          </GlassCard>
 
-          {/* Instructions */}
-          <GlassCard padding="$4">
-            <YStack space="$3">
-              <Text color={theme.colors.text.primary} fontSize="$5" fontWeight="bold">
-                Instructions
-              </Text>
-              {[
-                'Point your camera at a flat surface',
-                'Move your phone slowly to scan the area',
-                'Tap to place the car model',
-                'Use pinch gestures to resize'
-              ].map((instruction, index) => (
-                <XStack key={index} space="$2" alignItems="center">
-                  <Ionicons 
-                    name="checkmark-circle" 
-                    size={20} 
-                    color={theme.colors.secondary.yellow} 
-                  />
-                  <Text color={theme.colors.text.secondary} fontSize="$3">
-                    {instruction}
+            {/* Specs Cards */}
+            <XStack flexWrap="wrap" gap="$2" justifyContent="space-between">
+              {Object.entries(selectedCar.specs).map(([key, value]) => (
+                <GlassCard
+                  key={key}
+                  padding="$3"
+                  width={(width - 60) / 3}
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Text
+                    color={theme.colors.secondary.yellow}
+                    fontSize={10}
+                    textTransform="uppercase"
+                    marginBottom={4}
+                  >
+                    {key}
                   </Text>
-                </XStack>
+                  <Text
+                    color="white"
+                    fontSize={14}
+                    fontWeight="bold"
+                    textAlign="center"
+                  >
+                    {value}
+                  </Text>
+                </GlassCard>
               ))}
-            </YStack>
-          </GlassCard>
-        </YStack>
+            </XStack>
+
+            {/* Premium Message */}
+            <GlassCard 
+              marginTop="$6"
+              padding="$4"
+              alignItems="center"
+              space="$3"
+            >
+              <View style={{
+                backgroundColor: `${theme.colors.secondary.yellow}20`,
+                padding: 12,
+                borderRadius: 30,
+                marginBottom: 8,
+              }}>
+                <Ionicons 
+                  name="lock-closed" 
+                  size={24} 
+                  color={theme.colors.secondary.yellow}
+                />
+              </View>
+              <Text
+                color="white"
+                fontSize={20}
+                fontWeight="bold"
+                textAlign="center"
+              >
+                Unlock AR Experience
+              </Text>
+              <Text
+                color={theme.colors.text.secondary}
+                fontSize={14}
+                textAlign="center"
+                marginBottom={8}
+              >
+                Get premium access to view this model in augmented reality
+              </Text>
+              <Button
+                backgroundColor={theme.colors.secondary.yellow}
+                color={theme.colors.primary.dark}
+                size="$5"
+                width="100%"
+                onPress={() => navigation.navigate('Subscription')}
+                pressStyle={{ opacity: 0.8 }}
+                icon={<Ionicons name="star" size={18} color={theme.colors.primary.dark} />}
+              >
+                Upgrade to Premium
+              </Button>
+            </GlassCard>
+          </YStack>
+        </View>
       </ScrollView>
-    </ScreenLayout>
+    </View>
   );
 } 

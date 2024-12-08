@@ -7,10 +7,18 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const login = async (userData) => {
+  const login = async (responseData) => {
     try {
+      // The response data structure has a nested 'data' object
+      const userData = responseData.data;
+      
+      if (!userData || !userData.token) {
+        throw new Error('Invalid response data structure');
+      }
+
+      // Store user data and token
       await AsyncStorage.setItem('user', JSON.stringify(userData));
-      await AsyncStorage.setItem('token', userData.token);
+      await AsyncStorage.setItem('authToken', userData.token);
       setUser(userData);
     } catch (error) {
       console.error('Error storing auth data:', error);
@@ -21,7 +29,7 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await AsyncStorage.removeItem('user');
-      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('authToken');
       setUser(null);
     } catch (error) {
       console.error('Error removing auth data:', error);

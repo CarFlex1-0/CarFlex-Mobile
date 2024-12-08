@@ -15,3 +15,5 @@ start cmd /k "yarn expo start"
 
 echo All services started successfully!
 pause
+
+

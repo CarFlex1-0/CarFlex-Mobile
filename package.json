@@ -14,6 +14,7 @@
     "@react-navigation/bottom-tabs": "^7.0.7",
     "@react-navigation/native": "^7.0.4",
     "@react-navigation/native-stack": "^7.1.1",
+    "@stripe/stripe-react-native": "^0.40.0",
     "@tamagui/babel-plugin": "^1.117.0",
     "@tamagui/config": "^1.117.0",
     "@tamagui/core": "^1.117.0",
@@ -45,7 +46,8 @@
     "react-native-svg": "^15.9.0",
     "react-native-tcp-socket": "^6.2.0",
     "tailwindcss": "^3.4.15",
-    "tamagui": "^1.117.0"
+    "tamagui": "^1.117.0",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

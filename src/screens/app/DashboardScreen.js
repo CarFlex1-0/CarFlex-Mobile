@@ -18,27 +18,27 @@ export default function DashboardScreen({ navigation }) {
   const carModels = [
     {
       id: 1,
-      name: "Tesla Model S",
-      type: "Electric",
+      name: "Toyota Corolla",
+      type: "Sedan",
       status: "Ready",
-      image: "https://images.unsplash.com/photo-1617788138017-80ad40651399",
-      price: "$89,990",
+      image:
+        "https://images.unsplash.com/photo-1623869675781-80aa31012a5a?q=80&w=2070&auto=format&fit=crop",
     },
     {
       id: 2,
-      name: "BMW M4",
-      type: "Sports",
+      name: "Suzuki Swift",
+      type: "Hatchback",
       status: "Processing",
-      image: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738",
-      price: "$74,900",
+      image:
+        "https://images.unsplash.com/photo-1609521263047-f8f205293f24?q=80&w=2090&auto=format&fit=crop",
     },
     {
       id: 3,
-      name: "Mercedes G-Wagon",
-      type: "SUV",
+      name: "Honda Civic Type R",
+      type: "Sports Sedan",
       status: "Ready",
-      image: "https://images.unsplash.com/photo-1520031441872-265e4ff70366",
-      price: "$139,900",
+      image:
+        "https://images.unsplash.com/photo-1679263422551-159662623af3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
   ];
 
@@ -168,7 +168,7 @@ export default function DashboardScreen({ navigation }) {
                     source={{ uri: car.image }}
                     style={{
                       width: "100%",
-                      height: 220, // Increased height from 180
+                      height: 220,
                       borderTopLeftRadius: 16,
                       borderTopRightRadius: 16,
                     }}
@@ -190,18 +190,18 @@ export default function DashboardScreen({ navigation }) {
                         {car.name}
                       </Text>
                       <XStack
-                        justifyContent="space-between"
-                        alignItems="center"
+                        backgroundColor={`${theme.colors.secondary.yellow}20`}
+                        paddingHorizontal="$2"
+                        paddingVertical="$1"
+                        borderRadius="$2"
+                        alignSelf="flex-start"
                       >
-                        <Text color={theme.colors.text.secondary} fontSize="$3">
-                          {car.type}
-                        </Text>
                         <Text
-                          color={theme.colors.text.accent}
-                          fontSize="$4"
-                          fontWeight="bold"
+                          color={theme.colors.secondary.yellow}
+                          fontSize="$3"
+                          fontWeight="500"
                         >
-                          {car.price}
+                          {car.type}
                         </Text>
                       </XStack>
                     </YStack>

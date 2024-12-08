@@ -73,11 +73,20 @@ export default function LoginScreen({ navigation }) {
         email: email.toLowerCase(),
         password,
       });
-      await login(response.data);
-      showAlert("Success", "Login successful!");
-      navigation.navigate("MainTabs");
+
+      if (response.data && response.data.success) {
+        await login(response.data);
+        showAlert("Success", "Login successful!");
+        navigation.navigate("MainTabs");
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
-      showAlert("Error", error.response?.data?.message || "Login failed");
+      console.error('Login error:', error);
+      showAlert(
+        "Error", 
+        error.response?.data?.message || "Login failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
